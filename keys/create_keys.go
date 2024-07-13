@@ -5,7 +5,6 @@ package keys
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -18,7 +17,7 @@ const WorkKeyDir = "workKey"
 
 // createKeysCmd represents the createKeys command
 var cmd = &cobra.Command{
-	Use:   "rootkey",
+	Use:   "key-gen",
 	Short: "",
 	Long:  ``,
 	Run:   runCmd,
@@ -29,7 +28,7 @@ var forceFlag bool
 var workKeyFile string
 
 func init() {
-	cmd.Flags().StringVarP(&keyType, "type", "t", "work", "Key Type: root, work.")
+	cmd.Flags().StringVarP(&keyType, "type", "t", "root", "Key Type: root, work.")
 	cmd.Flags().StringVarP(&workKeyFile, "name", "n", "work.key", "Work Key File Name. eg: work.key")
 	cmd.Flags().BoolVarP(&forceFlag, "force", "f", false, "Force Create RootKey, Ignore Exist key.")
 }
@@ -49,9 +48,23 @@ func runCmd(cmd *cobra.Command, args []string) {
 			fmt.Println(err)
 			break
 		}
-		creatRootKey()
+		fmt.Println("Create Root Key Salt Done")
+		err = creatRootKey()
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		fmt.Println("Create Root Key Done")
 	case "work":
-		err := creatWorkKey(workKeyFile)
+		var err error
+		if forceFlag {
+			err = clearWorkKey(workKeyFile)
+		}
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+		err = creatWorkKey(workKeyFile)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -59,11 +72,4 @@ func runCmd(cmd *cobra.Command, args []string) {
 		fmt.Println("unknow type: " + keyType)
 	}
 
-}
-
-func clearExistKeys() {
-	fmt.Println("Clear exist key files")
-	os.Remove(RootKeyFile)
-	os.Remove(RootKeySaltFile)
-	os.RemoveAll(WorkKeyDir)
 }

@@ -11,16 +11,15 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func creatRootKey() {
+func creatRootKey() error {
 	_, err := os.Stat(RootKeyFile)
 	if !os.IsNotExist(err) {
-		fmt.Println("Root key file: " + RootKeyFile + " already exist")
-		return
+		msg := "root key file: " + RootKeyFile + " already exist"
+		return errors.New(msg)
 	}
 	fd, err := os.Create(RootKeyFile)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 
 	defer fd.Close()
@@ -28,24 +27,22 @@ func creatRootKey() {
 	for i := 0; i < KeyPartNum; i++ {
 		key, err := common.GetRandKey(KeyLen)
 		if err != nil {
-			fmt.Println(err)
-			continue
+			return err
 		}
 		fd.WriteString(common.TransByteToBase64(key) + "\n")
 	}
 
-	fmt.Println("Create Root Key Done")
+	return nil
 }
 
 func createKeySalt() error {
 	_, err := os.Stat(RootKeySaltFile)
 	if !os.IsNotExist(err) {
-		fmt.Println("Root key salt file: " + RootKeySaltFile + " already exist, exit")
-		return errors.New("root key salt already exist")
+		msg := "root key salt file: " + RootKeySaltFile + " already exist, exit"
+		return errors.New(msg)
 	}
 	fd, err := os.Create(RootKeySaltFile)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
@@ -53,14 +50,19 @@ func createKeySalt() error {
 
 	key, err := common.GetRandKey(KeyLen)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	fd.WriteString(common.TransByteToBase64(key))
 
-	fmt.Println("Create Root Key Salt Done")
 	return nil
+}
+
+func clearExistKeys() {
+	fmt.Println("Clear exist key files")
+	os.Remove(RootKeyFile)
+	os.Remove(RootKeySaltFile)
+	os.RemoveAll(WorkKeyDir)
 }
 
 func GetRootKey() ([]byte, error) {
@@ -85,13 +87,11 @@ func GetRootKey() ([]byte, error) {
 
 	//check byte len
 	if len(subs) < 2 {
-		fmt.Println("Rook key subs less than 2, not safe, exit")
 		return []byte{}, errors.New("rook key subs less than 2, not safe, exit")
 	}
 	l := len(subs[0])
 	for i := 1; i < len(subs); i++ {
 		if len(subs[i]) != l {
-			fmt.Println("Rook key subs length not same, exit")
 			return []byte{}, errors.New("rook key subs length not same, exit")
 		}
 	}

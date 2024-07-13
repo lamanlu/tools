@@ -27,3 +27,12 @@ func creatWorkKey(keyName string) error {
 	_, err = fd.WriteString(common.TransByteToBase64(key))
 	return err
 }
+
+func clearWorkKey(name string) error {
+	target := filepath.Join(WorkKeyDir, name)
+	_, err := os.Stat(target)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	return os.Remove(target)
+}
