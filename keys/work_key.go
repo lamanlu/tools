@@ -24,7 +24,17 @@ func creatWorkKey(keyName string) error {
 		return err
 	}
 
-	_, err = fd.WriteString(common.TransByteToBase64(key))
+	rootKey, err := GetRootKey()
+	if err != nil {
+		return err
+	}
+
+	encryptKey, err := common.Encrypt(key, rootKey)
+	if err != nil {
+		return err
+	}
+
+	_, err = fd.WriteString(common.TransByteToBase64(encryptKey))
 	return err
 }
 
