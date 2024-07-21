@@ -32,3 +32,8 @@ func TouchPath(path string, mode uint32) error {
 	err = os.MkdirAll(path, fs.FileMode(mode))
 	return err
 }
+
+func FileExist(file string) bool {
+	_, err := os.Stat(file)
+	return !os.IsNotExist(err)
+}

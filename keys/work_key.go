@@ -1,6 +1,7 @@
 package keys
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -45,4 +46,12 @@ func clearWorkKey(name string) error {
 		return nil
 	}
 	return os.Remove(target)
+}
+
+func getWorkKey(keyFile string) ([]byte, error) {
+	keyFile = filepath.Join(WorkKeyDir, keyFile)
+	if !common.FileExist(keyFile) {
+		return []byte{}, errors.New("work key file: " + keyFile + " is not exist.")
+	}
+	return os.ReadFile(keyFile)
 }
