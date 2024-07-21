@@ -65,7 +65,7 @@ func clearExistKeys() {
 	os.RemoveAll(WorkKeyDir)
 }
 
-func GetRootKey() ([]byte, error) {
+func getRootKey() ([]byte, error) {
 	var subs [][]byte
 
 	fd, err := os.Open(RootKeyFile)

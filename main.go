@@ -6,6 +6,7 @@ package main
 import (
 	"os"
 
+	"github.com/lamanlu/tools/encrypt"
 	"github.com/lamanlu/tools/keys"
 	"github.com/spf13/cobra"
 )
@@ -18,6 +19,7 @@ var rootCmd = &cobra.Command{
 
 func setCmds() {
 	rootCmd.AddCommand(keys.GetCmd())
+	rootCmd.AddCommand(encrypt.GetCmd())
 }
 
 func main() {

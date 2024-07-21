@@ -25,7 +25,7 @@ func creatWorkKey(keyName string) error {
 		return err
 	}
 
-	rootKey, err := GetRootKey()
+	rootKey, err := getRootKey()
 	if err != nil {
 		return err
 	}
@@ -53,5 +53,21 @@ func getWorkKey(keyFile string) ([]byte, error) {
 	if !common.FileExist(keyFile) {
 		return []byte{}, errors.New("work key file: " + keyFile + " is not exist.")
 	}
-	return os.ReadFile(keyFile)
+
+	keyStr, err := os.ReadFile(keyFile)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	workKey, err := common.TransBase64ToByte(string(keyStr))
+	if err != nil {
+		return []byte{}, err
+	}
+
+	rootKey, err := getRootKey()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return common.Decrypt(workKey, rootKey)
 }
