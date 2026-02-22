@@ -18,10 +18,10 @@ func GetCmd() *cobra.Command {
 	return cmd
 }
 
-var workKeyFIle string
+var workKeyFile string
 
 func init() {
-	cmd.Flags().StringVarP(&workKeyFIle, "work-key", "key", "", "Work key file name, using for encrypt input string.")
+	cmd.Flags().StringVarP(&workKeyFile, "work-key", "k", "", "Work key file name, using for encrypt input string.")
 }
 
 func runCmd(cmd *cobra.Command, args []string) error {
@@ -29,7 +29,7 @@ func runCmd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid input string")
 	}
 	input := args[0]
-	encryptStr, err := common.EncryptInput(input, workKeyFIle)
+	encryptStr, err := common.EncryptInput(input, workKeyFile)
 	if err != nil {
 		return err
 	}

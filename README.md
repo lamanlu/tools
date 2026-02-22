@@ -27,6 +27,7 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
+  decrypt     Decrypt a Base64 string with a work key
   encrypt     Encrypt a string with a work key
   help        Help about any command
   key-gen     Generate root or work keys
@@ -66,6 +67,19 @@ Flags:
   -k, --work-key string   Work key file name, using for encrypt input string.
 ```
 
+### tools decrypt --help 输出
+
+```text
+Decrypt a Base64-encoded ciphertext using the specified work key file and output plaintext.
+
+Usage:
+  tools decrypt [flags]
+
+Flags:
+  -h, --help              help for decrypt
+  -k, --work-key string   Work key file name, using for decrypt input string.
+```
+
 ### 1) 生成根密钥（root key）
 生成根密钥与盐文件，会在 `rootKey/` 目录产生 `root_part_1.key`、`root_part_2.key` 与 `root.salt`。
 
@@ -95,10 +109,35 @@ Flags:
 ```
 
 ### 3) 加密输入字符串
-使用工作密钥加密输入字符串，输出为 Base64。
+使用工作密钥加密输入字符串，输出为 Base64（不带换行）。
 
 ```bash
 ./tools encrypt --work-key work.key "your-string"
+```
+
+### 4) 解密 Base64 字符串
+使用工作密钥解密 Base64 密文，输出明文（不带换行）。
+
+```bash
+./tools decrypt --work-key work.key "base64-cipher-text"
+```
+
+## 完整加解密示例
+
+```bash
+# 1. 生成 root key 与 salt（在 rootKey/ 目录）
+./tools key-gen --type root
+
+# 2. 生成工作密钥（在 workKey/ 目录）
+./tools key-gen --type work --name work.key
+
+# 3. 加密字符串（输出 Base64）
+cipher=$(./tools encrypt --work-key work.key "hello-world")
+echo "$cipher"
+
+# 4. 解密 Base64（输出明文）
+plain=$(./tools decrypt --work-key work.key "$cipher")
+echo "$plain"
 ```
 
 ## 目录结构（核心部分）
