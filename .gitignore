@@ -9,6 +9,9 @@
 *.dylib
 tools
 
+# IDE
+/.idea/
+
 # Local build outputs
 /tools
 /coverage.out
@@ -16,6 +19,7 @@ tools
 # Key material (do not commit)
 *.key
 *.salt
+/rootKey/
 /workKey/
 
 # Test binary, built with `go test -c`

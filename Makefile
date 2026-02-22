@@ -5,6 +5,5 @@ all:build
 
 build:
 	@echo "Building..."
-	rm -f $(TargetPath)/$(AppName)
-	go build -o $(TargetPath)/$(AppName) ./main.go
+	@cd $(CURDIR) && rm -f $(TargetPath)/$(AppName) && go build -o $(TargetPath)/$(AppName) ./main.go
 	@echo "Done"

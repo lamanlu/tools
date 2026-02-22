@@ -13,8 +13,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "tools",
-	Short: "A command tool for myself",
-	Long:  `A command tool for myself`,
+	Short: "CLI utilities for key generation and encryption",
+	Long:  "CLI utilities for generating root/work keys and encrypting strings using work keys.",
 }
 
 func setCmds() {

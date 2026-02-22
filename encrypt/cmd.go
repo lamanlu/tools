@@ -9,9 +9,9 @@ import (
 
 var cmd = &cobra.Command{
 	Use:   "encrypt",
-	Short: "",
-	Long:  ``,
-	Run:   runCmd,
+	Short: "Encrypt a string with a work key",
+	Long:  "Encrypt a plaintext string using the specified work key file and output Base64.",
+	RunE:  runCmd,
 }
 
 func GetCmd() *cobra.Command {
@@ -24,18 +24,15 @@ func init() {
 	cmd.Flags().StringVarP(&workKeyFIle, "work-key", "k", "", "Work key file name, using for encrypt input string.")
 }
 
-func runCmd(cmd *cobra.Command, args []string) {
+func runCmd(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
-		fmt.Println("Invalid input string")
-		return
+		return fmt.Errorf("invalid input string")
 	}
 	input := args[0]
-	fmt.Println("Input is: " + input)
 	encryptStr, err := keys.EncryptInput(input, workKeyFIle)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
-	fmt.Println("Encrypt successfully.")
-	fmt.Println(encryptStr)
+	fmt.Print(encryptStr)
+	return nil
 }
