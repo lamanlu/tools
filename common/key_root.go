@@ -1,52 +1,44 @@
-package keys
+package common
 
 import (
 	"crypto/sha512"
 	"errors"
-	"fmt"
 	"os"
-	"path/filepath"
 
-	"github.com/lamanlu/tools/common"
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func rootPartFileName(idx int) string {
-	name := fmt.Sprintf("%s%d%s", RootKeyPartPrefix, idx+1, RootKeyPartSuffix)
-	return filepath.Join(RootKeyDir, name)
-}
+const (
+	KeyLen     = 32
+	KeyPartNum = 2
+)
 
-func rootSaltFileName() string {
-	return filepath.Join(RootKeyDir, RootKeySaltFile)
-}
-
-func creatRootKey() error {
-	err := common.TouchPath(RootKeyDir, 0740)
+func CreateRootKeyParts() error {
+	err := TouchPath(RootKeyDir, 0740)
 	if err != nil {
 		return err
 	}
 
 	for i := 0; i < KeyPartNum; i++ {
-		fileName := rootPartFileName(i)
+		fileName := RootPartFileName(i)
 		_, err := os.Stat(fileName)
 		if !os.IsNotExist(err) {
-			msg := "root key file: " + fileName + " already exist"
-			return errors.New(msg)
+			return errors.New("root key file: " + fileName + " already exist")
 		}
 	}
 
 	for i := 0; i < KeyPartNum; i++ {
-		fileName := rootPartFileName(i)
+		fileName := RootPartFileName(i)
 		fd, err := os.Create(fileName)
 		if err != nil {
 			return err
 		}
-		key, err := common.GetRandKey(KeyLen)
+		key, err := GetRandKey(KeyLen)
 		if err != nil {
 			fd.Close()
 			return err
 		}
-		_, err = fd.WriteString(common.TransByteToBase64(key))
+		_, err = fd.WriteString(TransByteToBase64(key))
 		fd.Close()
 		if err != nil {
 			return err
@@ -56,61 +48,56 @@ func creatRootKey() error {
 	return nil
 }
 
-func createKeySalt() error {
-	err := common.TouchPath(RootKeyDir, 0740)
+func CreateRootKeySalt() error {
+	err := TouchPath(RootKeyDir, 0740)
 	if err != nil {
 		return err
 	}
 
-	saltFile := rootSaltFileName()
+	saltFile := RootSaltFileName()
 	_, err = os.Stat(saltFile)
 	if !os.IsNotExist(err) {
-		msg := "root key salt file: " + saltFile + " already exist, exit"
-		return errors.New(msg)
+		return errors.New("root key salt file: " + saltFile + " already exist, exit")
 	}
 	fd, err := os.Create(saltFile)
 	if err != nil {
 		return err
 	}
-
 	defer fd.Close()
 
-	key, err := common.GetRandKey(KeyLen)
+	key, err := GetRandKey(KeyLen)
 	if err != nil {
 		return err
 	}
 
-	fd.WriteString(common.TransByteToBase64(key))
-
-	return nil
+	_, err = fd.WriteString(TransByteToBase64(key))
+	return err
 }
 
-func clearExistKeys() {
-	fmt.Println("Clear exist key files")
+func ClearAllKeys() {
 	for i := 0; i < KeyPartNum; i++ {
-		os.Remove(rootPartFileName(i))
+		_ = os.Remove(RootPartFileName(i))
 	}
-	os.Remove(rootSaltFileName())
-	os.RemoveAll(WorkKeyDir)
+	_ = os.Remove(RootSaltFileName())
+	_ = os.RemoveAll(WorkKeyDir)
 }
 
-func getRootKey() ([]byte, error) {
+func GetRootKey() ([]byte, error) {
 	var subs [][]byte
 
 	for i := 0; i < KeyPartNum; i++ {
-		fileName := rootPartFileName(i)
+		fileName := RootPartFileName(i)
 		keyStr, err := os.ReadFile(fileName)
 		if err != nil {
 			return []byte{}, err
 		}
-		sub, err := common.TransBase64ToByte(string(keyStr))
+		sub, err := TransBase64ToByte(string(keyStr))
 		if err != nil {
 			return []byte{}, err
 		}
 		subs = append(subs, sub)
 	}
 
-	//check byte len
 	if len(subs) < 2 {
 		return []byte{}, errors.New("root key subs less than 2, not safe, exit")
 	}
@@ -121,11 +108,11 @@ func getRootKey() ([]byte, error) {
 		}
 	}
 
-	saltStr, err := os.ReadFile(rootSaltFileName())
+	saltStr, err := os.ReadFile(RootSaltFileName())
 	if err != nil {
 		return []byte{}, err
 	}
-	salt, err := common.TransBase64ToByte(string(saltStr))
+	salt, err := TransBase64ToByte(string(saltStr))
 	if err != nil {
 		return []byte{}, err
 	}
@@ -140,5 +127,4 @@ func getRootKey() ([]byte, error) {
 	rootKey := pbkdf2.Key(matrix, salt, 100000, KeyLen, sha512.New)
 
 	return rootKey, nil
-
 }

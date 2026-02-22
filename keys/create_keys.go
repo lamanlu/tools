@@ -6,16 +6,9 @@ package keys
 import (
 	"fmt"
 
+	"github.com/lamanlu/tools/common"
 	"github.com/spf13/cobra"
 )
-
-const RootKeyDir = "rootKey"
-const RootKeyPartPrefix = "root_part_"
-const RootKeyPartSuffix = ".key"
-const RootKeySaltFile = "root.salt"
-const KeyLen = 32
-const KeyPartNum = 2
-const WorkKeyDir = "workKey"
 
 // createKeysCmd represents the createKeys command
 var cmd = &cobra.Command{
@@ -49,14 +42,14 @@ func runCmd(cmd *cobra.Command, args []string) error {
 	switch keyType {
 	case "root":
 		if forceFlag {
-			clearExistKeys()
+			common.ClearAllKeys()
 		}
-		err := createKeySalt()
+		err := common.CreateRootKeySalt()
 		if err != nil {
 			return err
 		}
 		fmt.Println("Create Root Key Salt Done")
-		err = creatRootKey()
+		err = common.CreateRootKeyParts()
 		if err != nil {
 			return err
 		}
@@ -64,12 +57,12 @@ func runCmd(cmd *cobra.Command, args []string) error {
 	case "work":
 		var err error
 		if forceFlag {
-			err = clearWorkKey(workKeyFile)
+			err = common.ClearWorkKey(workKeyFile)
 		}
 		if err != nil {
 			return err
 		}
-		err = creatWorkKey(workKeyFile)
+		err = common.CreateWorkKey(workKeyFile)
 		if err != nil {
 			return err
 		}

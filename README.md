@@ -73,6 +73,8 @@ Flags:
 ./tools key-gen --type root
 ```
 
+注意：`--type` 为必填参数。
+
 如需强制覆盖已有文件：
 
 ```bash
@@ -102,9 +104,9 @@ Flags:
 ## 目录结构（核心部分）
 
 - `main.go`：入口与命令注册
-- `keys/`：root/work key 生成与读取逻辑
+- `keys/`：key-gen 命令实现（参数解析与调用）
 - `encrypt/`：字符串加密命令
-- `common/`：加密与编码等通用工具
+- `common/`：加密、密钥生成/读取与路径等通用逻辑
 
 ## 注意事项
 

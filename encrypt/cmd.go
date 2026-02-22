@@ -3,7 +3,7 @@ package encrypt
 import (
 	"fmt"
 
-	"github.com/lamanlu/tools/keys"
+	"github.com/lamanlu/tools/common"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ func GetCmd() *cobra.Command {
 var workKeyFIle string
 
 func init() {
-	cmd.Flags().StringVarP(&workKeyFIle, "work-key", "k", "", "Work key file name, using for encrypt input string.")
+	cmd.Flags().StringVarP(&workKeyFIle, "work-key", "key", "", "Work key file name, using for encrypt input string.")
 }
 
 func runCmd(cmd *cobra.Command, args []string) error {
@@ -29,7 +29,7 @@ func runCmd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid input string")
 	}
 	input := args[0]
-	encryptStr, err := keys.EncryptInput(input, workKeyFIle)
+	encryptStr, err := common.EncryptInput(input, workKeyFIle)
 	if err != nil {
 		return err
 	}
