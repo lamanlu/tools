@@ -10,6 +10,7 @@
 - `make build`: Builds the `tools` binary into the repo root (removes any existing binary first).
 - `go build -o ./tools ./main.go`: Equivalent manual build.
 - `go test ./...`: Runs Go tests for all packages (currently there are no test files, so it should be quick).
+- `./tools_self_check.sh`: End-to-end self-check (build, key generation, encrypt/decrypt, and verification).
 
 ## Coding Style & Naming Conventions
 - Language: Go 1.25.6.
@@ -32,5 +33,5 @@
   - Any CLI usage updates or example commands if behavior changes.
 
 ## Security & Configuration Tips
-- The `keys/` package handles key material. Avoid logging secrets and be cautious with sample data in tests or docs.
+- The `common/` package handles key material. Avoid logging secrets and be cautious with sample data in tests or docs.
 - If you add config files, keep defaults out of the repo and document expected paths (e.g., `$HOME/.tools.yaml`).

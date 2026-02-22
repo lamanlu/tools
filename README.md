@@ -140,6 +140,14 @@ plain=$(./tools decrypt --work-key work.key "$cipher")
 echo "$plain"
 ```
 
+## 自验证脚本
+
+运行全流程自检脚本（构建、生成密钥、加解密并校验一致性）：
+
+```bash
+./tools_self_check.sh
+```
+
 ## 目录结构（核心部分）
 
 - `main.go`：入口与命令注册
