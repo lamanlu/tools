@@ -15,6 +15,7 @@ tools
 # Local build outputs
 /tools
 /coverage.out
+tools-*.tar.gz
 
 # Key material (do not commit)
 *.key
