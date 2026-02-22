@@ -147,6 +147,19 @@ echo "$plain"
 ```bash
 ./tools_self_check.sh
 ```
+预期执行结果如下：
+```
+[1/5] build...
+Building...
+Done
+[2/5] generate root key...
+Create Root Key Salt Done
+Create Root Key Done
+[3/5] generate work key...
+Create Work Key: work.key Done
+[4/5] encrypt/decrypt...
+[5/5] ok
+```
 
 ## 目录结构（核心部分）
 

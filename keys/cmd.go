@@ -66,6 +66,7 @@ func runCmd(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+		fmt.Printf("Create Work Key: %s Done\n", workKeyFile)
 	default:
 		return fmt.Errorf("unknown type: %s", keyType)
 	}
