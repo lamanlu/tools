@@ -8,8 +8,15 @@
 *.so
 *.dylib
 tools
+
+# Local build outputs
+/tools
+/coverage.out
+
+# Key material (do not commit)
 *.key
 *.salt
+/workKey/
 
 # Test binary, built with `go test -c`
 *.test
