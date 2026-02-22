@@ -8,7 +8,7 @@
 
 ## Build, Test, and Development Commands
 - `make build`: Builds the `tools` binary into the repo root (removes any existing binary first).
-- `go build -o ./tools ./main.go`: Equivalent manual build.
+- `go build -mod=readonly -trimpath -buildvcs=false -ldflags="-s -w" -o ./tools ./main.go`: Equivalent manual build with safety flags.
 - `go test ./...`: Runs Go tests for all packages (currently there are no test files, so it should be quick).
 - `./tools_self_check.sh`: End-to-end self-check (build, key generation, encrypt/decrypt, and verification).
 

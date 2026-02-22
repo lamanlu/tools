@@ -12,7 +12,7 @@ make build
 或直接构建：
 
 ```bash
-go build -o ./tools ./main.go
+go build -mod=readonly -trimpath -buildvcs=false -ldflags="-s -w" -o ./tools ./main.go
 ```
 
 ## 功能与用法
