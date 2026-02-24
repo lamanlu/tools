@@ -19,15 +19,18 @@ func GetCmd() *cobra.Command {
 }
 
 var workKeyFile string
+var keyBaseDir string
 
 func init() {
 	cmd.Flags().StringVarP(&workKeyFile, "work-key", "k", "", "Work key file name, using for decrypt input string.")
+	cmd.Flags().StringVarP(&keyBaseDir, "key-dir", "d", "", "Key base directory containing rootKey/workKey.")
 }
 
 func runCmd(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("invalid base64 input string")
 	}
+	common.SetKeyBaseDir(keyBaseDir)
 	input := args[0]
 	plain, err := common.DecryptInput(input, workKeyFile)
 	if err != nil {

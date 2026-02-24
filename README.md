@@ -48,6 +48,7 @@ Usage:
   tools key-gen [flags]
 
 Flags:
+  -d, --dir string    Key base directory. Will create rootKey/workKey under it.
   -f, --force         Force Create RootKey, Ignore Exist key.
   -h, --help          help for key-gen
   -n, --name string   Work Key File Name. eg: work.key (default "work.key")
@@ -63,6 +64,7 @@ Usage:
   tools encrypt [flags]
 
 Flags:
+  -d, --key-dir string    Key base directory containing rootKey/workKey.
   -h, --help              help for encrypt
   -k, --work-key string   Work key file name, using for encrypt input string.
 ```
@@ -76,6 +78,7 @@ Usage:
   tools decrypt [flags]
 
 Flags:
+  -d, --key-dir string    Key base directory containing rootKey/workKey.
   -h, --help              help for decrypt
   -k, --work-key string   Work key file name, using for decrypt input string.
 ```
@@ -95,6 +98,12 @@ Flags:
 ./tools key-gen --type root --force
 ```
 
+指定自定义密钥目录（会在目录下创建 `rootKey/` 与 `workKey/`）：
+
+```bash
+./tools key-gen --type root --dir /tmp/keys
+```
+
 ### 2) 生成工作密钥（work key）
 工作密钥会生成在 `workKey/` 目录下，并使用 root key 进行加密存储。
 
@@ -108,11 +117,23 @@ Flags:
 ./tools key-gen --type work --name work.key --force
 ```
 
+指定自定义密钥目录：
+
+```bash
+./tools key-gen --type work --name work.key --dir /tmp/keys
+```
+
 ### 3) 加密输入字符串
 使用工作密钥加密输入字符串，输出为 Base64（不带换行）。
 
 ```bash
 ./tools encrypt --work-key work.key "your-string"
+```
+
+使用自定义密钥目录：
+
+```bash
+./tools encrypt --work-key work.key --key-dir /tmp/keys "your-string"
 ```
 
 ### 4) 解密 Base64 字符串
@@ -122,21 +143,27 @@ Flags:
 ./tools decrypt --work-key work.key "base64-cipher-text"
 ```
 
+使用自定义密钥目录：
+
+```bash
+./tools decrypt --work-key work.key --key-dir /tmp/keys "base64-cipher-text"
+```
+
 ## 完整加解密示例
 
 ```bash
-# 1. 生成 root key 与 salt（在 rootKey/ 目录）
-./tools key-gen --type root
+# 1. 生成 root key 与 salt（在自定义目录下的 rootKey/）
+./tools key-gen --type root --dir /tmp/keys
 
-# 2. 生成工作密钥（在 workKey/ 目录）
-./tools key-gen --type work --name work.key
+# 2. 生成工作密钥（在自定义目录下的 workKey/）
+./tools key-gen --type work --name work.key --dir /tmp/keys
 
 # 3. 加密字符串（输出 Base64）
-cipher=$(./tools encrypt --work-key work.key "hello-world")
+cipher=$(./tools encrypt --work-key work.key --key-dir /tmp/keys "hello-world")
 echo "$cipher"
 
 # 4. 解密 Base64（输出明文）
-plain=$(./tools decrypt --work-key work.key "$cipher")
+plain=$(./tools decrypt --work-key work.key --key-dir /tmp/keys "$cipher")
 echo "$plain"
 ```
 

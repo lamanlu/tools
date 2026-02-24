@@ -6,12 +6,29 @@ import (
 )
 
 const (
-	RootKeyDir        = "rootKey"
 	RootKeyPartPrefix = "root_part_"
 	RootKeyPartSuffix = ".key"
 	RootKeySaltFile   = "root.salt"
-	WorkKeyDir        = "workKey"
 )
+
+var (
+	RootKeyDir = "rootKey"
+	WorkKeyDir = "workKey"
+)
+
+func SetKeyBaseDir(base string) {
+	if base == "" {
+		return
+	}
+	base = filepath.Clean(base)
+	if base == "." {
+		RootKeyDir = "rootKey"
+		WorkKeyDir = "workKey"
+		return
+	}
+	RootKeyDir = filepath.Join(base, "rootKey")
+	WorkKeyDir = filepath.Join(base, "workKey")
+}
 
 func RootPartFileName(idx int) string {
 	name := fmt.Sprintf("%s%d%s", RootKeyPartPrefix, idx+1, RootKeyPartSuffix)

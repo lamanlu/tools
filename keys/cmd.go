@@ -21,10 +21,12 @@ var cmd = &cobra.Command{
 var keyType string
 var forceFlag bool
 var workKeyFile string
+var keyBaseDir string
 
 func init() {
 	cmd.Flags().StringVarP(&keyType, "type", "t", "", "Key Type: root, work.")
 	cmd.Flags().StringVarP(&workKeyFile, "name", "n", "work.key", "Work Key File Name. eg: work.key")
+	cmd.Flags().StringVarP(&keyBaseDir, "dir", "d", "", "Key base directory. Will create rootKey/workKey under it.")
 	cmd.Flags().BoolVarP(&forceFlag, "force", "f", false, "Force Create RootKey, Ignore Exist key.")
 	if err := cmd.MarkFlagRequired("type"); err != nil {
 		panic(err)
@@ -39,6 +41,7 @@ func runCmd(cmd *cobra.Command, args []string) error {
 	if keyType == "" {
 		return fmt.Errorf("type is required")
 	}
+	common.SetKeyBaseDir(keyBaseDir)
 	switch keyType {
 	case "root":
 		if forceFlag {
