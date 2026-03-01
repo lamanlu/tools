@@ -19,7 +19,9 @@ var rootCmd = &cobra.Command{
 }
 
 func setCmds() {
-	rootCmd.AddCommand(keys.GetCmd())
+	for _, cmd := range keys.GetCmds() {
+		rootCmd.AddCommand(cmd)
+	}
 	rootCmd.AddCommand(encrypt.GetCmd())
 	rootCmd.AddCommand(decrypt.GetCmd())
 }

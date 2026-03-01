@@ -10,82 +10,94 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// createKeysCmd represents the createKeys command
-var cmd = &cobra.Command{
-	Use:   "key-gen",
-	Short: "Generate root/work/random key files",
-	Long:  "Generate root keys (rootKey/root_part_*.key + rootKey/root.salt), a work key encrypted by the root key, or a random key file.",
-	RunE:  runCmd,
-}
-
-var keyType string
 var forceFlag bool
 var workKeyFile string
 var keyBaseDir string
 
-func init() {
-	cmd.Flags().StringVarP(&keyType, "type", "t", "", "Key Type: root, work, random.")
-	cmd.Flags().StringVarP(&workKeyFile, "name", "n", "work.key", "Work Key File Name. eg: work.key")
+func GetCmds() []*cobra.Command {
+	return []*cobra.Command{
+		newGenRootKeyCmd(),
+		newGenWorkKeyCmd(),
+		newGenRandomKeyCmd(),
+	}
+}
+
+func applyBaseFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&keyBaseDir, "dir", "d", "", "Key base directory. Will create rootKey/workKey under it.")
-	cmd.Flags().BoolVarP(&forceFlag, "force", "f", false, "Force Create RootKey, Ignore Exist key.")
-	if err := cmd.MarkFlagRequired("type"); err != nil {
-		panic(err)
-	}
 }
 
-func GetCmd() *cobra.Command {
-	return cmd
+func newGenRootKeyCmd() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:   "gen-root-key",
+		Short: "Generate root key files",
+		Long:  "Generate root keys (rootKey/root_part_*.key + rootKey/root.salt).",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			common.SetKeyBaseDir(keyBaseDir)
+			if forceFlag {
+				common.ClearAllKeys()
+			}
+			if err := common.CreateRootKeySalt(); err != nil {
+				return err
+			}
+			fmt.Println("Create Root Key Salt Done")
+			if err := common.CreateRootKeyParts(); err != nil {
+				return err
+			}
+			fmt.Println("Create Root Key Done")
+			return nil
+		},
+	}
+	applyBaseFlags(rootCmd)
+	rootCmd.Flags().BoolVarP(&forceFlag, "force", "f", false, "Force Create RootKey, Ignore Exist key.")
+	return rootCmd
 }
 
-func runCmd(cmd *cobra.Command, args []string) error {
-	if keyType == "" {
-		return fmt.Errorf("type is required")
+func newGenWorkKeyCmd() *cobra.Command {
+	workCmd := &cobra.Command{
+		Use:   "gen-work-key",
+		Short: "Generate a work key file",
+		Long:  "Generate a work key encrypted by the root key.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			common.SetKeyBaseDir(keyBaseDir)
+			if forceFlag {
+				if err := common.ClearWorkKey(workKeyFile); err != nil {
+					return err
+				}
+			}
+			if err := common.CreateWorkKey(workKeyFile); err != nil {
+				return err
+			}
+			fmt.Printf("Create Work Key: %s Done\n", workKeyFile)
+			return nil
+		},
 	}
-	common.SetKeyBaseDir(keyBaseDir)
-	switch keyType {
-	case "root":
-		if forceFlag {
-			common.ClearAllKeys()
-		}
-		err := common.CreateRootKeySalt()
-		if err != nil {
-			return err
-		}
-		fmt.Println("Create Root Key Salt Done")
-		err = common.CreateRootKeyParts()
-		if err != nil {
-			return err
-		}
-		fmt.Println("Create Root Key Done")
-	case "work":
-		var err error
-		if forceFlag {
-			err = common.ClearWorkKey(workKeyFile)
-		}
-		if err != nil {
-			return err
-		}
-		err = common.CreateWorkKey(workKeyFile)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Create Work Key: %s Done\n", workKeyFile)
-	case "random":
-		var err error
-		if forceFlag {
-			err = common.ClearWorkKey(workKeyFile)
-		}
-		if err != nil {
-			return err
-		}
-		err = common.CreateRandomKeyFile(workKeyFile)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Create Random Key File: %s Done\n", workKeyFile)
-	default:
-		return fmt.Errorf("unknown type: %s", keyType)
-	}
+	applyBaseFlags(workCmd)
+	workCmd.Flags().StringVarP(&workKeyFile, "name", "n", "work.key", "Work Key File Name. eg: work.key")
+	workCmd.Flags().BoolVarP(&forceFlag, "force", "f", false, "Force Create WorkKey, Ignore Exist key.")
+	return workCmd
+}
 
-	return nil
+func newGenRandomKeyCmd() *cobra.Command {
+	randomCmd := &cobra.Command{
+		Use:   "gen-random-key",
+		Short: "Generate a random key file",
+		Long:  "Generate a random key file (Base64, 32 bytes) in workKey directory.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			common.SetKeyBaseDir(keyBaseDir)
+			if forceFlag {
+				if err := common.ClearWorkKey(workKeyFile); err != nil {
+					return err
+				}
+			}
+			if err := common.CreateRandomKeyFile(workKeyFile); err != nil {
+				return err
+			}
+			fmt.Printf("Create Random Key File: %s Done\n", workKeyFile)
+			return nil
+		},
+	}
+	applyBaseFlags(randomCmd)
+	randomCmd.Flags().StringVarP(&workKeyFile, "name", "n", "random.key", "Random Key File Name. eg: random.key")
+	randomCmd.Flags().BoolVarP(&forceFlag, "force", "f", false, "Force Create RandomKey, Ignore Exist key.")
+	return randomCmd
 }

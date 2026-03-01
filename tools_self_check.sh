@@ -15,10 +15,10 @@ printf "[1/5] build...\n"
 make build
 
 printf "[2/5] generate root key...\n"
-./tools key-gen --type root --force --dir "$KEY_DIR"
+./tools gen-root-key --force --dir "$KEY_DIR"
 
 printf "[3/5] generate work key...\n"
-./tools key-gen --type work --name work.key --force --dir "$KEY_DIR"
+./tools gen-work-key --name work.key --force --dir "$KEY_DIR"
 
 printf "[4/5] encrypt/decrypt...\n"
 plain="hello-world-$(date +%s)"

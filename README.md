@@ -29,8 +29,10 @@ Available Commands:
   completion  Generate the autocompletion script for the specified shell
   decrypt     Decrypt a Base64 string with a work key
   encrypt     Encrypt a string with a work key
+  gen-random-key  Generate a random key file
+  gen-root-key    Generate root key files
+  gen-work-key    Generate a work key file
   help        Help about any command
-  key-gen     Generate root/work/random key files
 
 Flags:
   -c, --check   Check cmd run conditions
@@ -39,20 +41,48 @@ Flags:
 Use "tools [command] --help" for more information about a command.
 ```
 
-### tools key-gen --help 输出
+### tools gen-root-key --help 输出
 
 ```text
-Generate root keys (rootKey/root_part_*.key + rootKey/root.salt), a work key encrypted by the root key, or a random key file.
+Generate root keys (rootKey/root_part_*.key + rootKey/root.salt).
 
 Usage:
-  tools key-gen [flags]
+  tools gen-root-key [flags]
 
 Flags:
-  -d, --dir string    Key base directory. Will create rootKey/workKey under it.
+  -d, --dir string   Key base directory. Will create rootKey/workKey under it.
   -f, --force         Force Create RootKey, Ignore Exist key.
-  -h, --help          help for key-gen
+  -h, --help         help for gen-root-key
+```
+
+### tools gen-work-key --help 输出
+
+```text
+Generate a work key encrypted by the root key.
+
+Usage:
+  tools gen-work-key [flags]
+
+Flags:
+  -d, --dir string   Key base directory. Will create rootKey/workKey under it.
+  -f, --force         Force Create WorkKey, Ignore Exist key.
+  -h, --help          help for gen-work-key
   -n, --name string   Work Key File Name. eg: work.key (default "work.key")
-  -t, --type string   Key Type: root, work, random.
+```
+
+### tools gen-random-key --help 输出
+
+```text
+Generate a random key file (Base64, 32 bytes) in workKey directory.
+
+Usage:
+  tools gen-random-key [flags]
+
+Flags:
+  -d, --dir string   Key base directory. Will create rootKey/workKey under it.
+  -f, --force         Force Create RandomKey, Ignore Exist key.
+  -h, --help          help for gen-random-key
+  -n, --name string   Random Key File Name. eg: random.key (default "random.key")
 ```
 
 ### tools encrypt --help 输出
@@ -87,59 +117,57 @@ Flags:
 生成根密钥与盐文件，会在 `rootKey/` 目录产生 `root_part_1.key`、`root_part_2.key` 与 `root.salt`。
 
 ```bash
-./tools key-gen --type root
+./tools gen-root-key
 ```
-
-注意：`--type` 为必填参数。
 
 如需强制覆盖已有文件：
 
 ```bash
-./tools key-gen --type root --force
+./tools gen-root-key --force
 ```
 
 指定自定义密钥目录（会在目录下创建 `rootKey/` 与 `workKey/`）：
 
 ```bash
-./tools key-gen --type root --dir /tmp/keys
+./tools gen-root-key --dir /tmp/keys
 ```
 
 ### 2) 生成工作密钥（work key）
 工作密钥会生成在 `workKey/` 目录下，并使用 root key 进行加密存储。
 
 ```bash
-./tools key-gen --type work --name work.key
+./tools gen-work-key --name work.key
 ```
 
 强制重建指定工作密钥：
 
 ```bash
-./tools key-gen --type work --name work.key --force
+./tools gen-work-key --name work.key --force
 ```
 
 指定自定义密钥目录：
 
 ```bash
-./tools key-gen --type work --name work.key --dir /tmp/keys
+./tools gen-work-key --name work.key --dir /tmp/keys
 ```
 
 ### 3) 生成随机密钥文件（random key file）
 随机密钥文件会生成在 `workKey/` 目录下，文件内容是一个 Base64 编码的随机密钥（长度 32 字节）。
 
 ```bash
-./tools key-gen --type random --name random.key
+./tools gen-random-key --name random.key
 ```
 
 强制重建指定随机密钥文件：
 
 ```bash
-./tools key-gen --type random --name random.key --force
+./tools gen-random-key --name random.key --force
 ```
 
 指定自定义密钥目录：
 
 ```bash
-./tools key-gen --type random --name random.key --dir /tmp/keys
+./tools gen-random-key --name random.key --dir /tmp/keys
 ```
 
 ### 4) 加密输入字符串
@@ -172,10 +200,10 @@ Flags:
 
 ```bash
 # 1. 生成 root key 与 salt（在自定义目录下的 rootKey/）
-./tools key-gen --type root --dir /tmp/keys
+./tools gen-root-key --dir /tmp/keys
 
 # 2. 生成工作密钥（在自定义目录下的 workKey/）
-./tools key-gen --type work --name work.key --dir /tmp/keys
+./tools gen-work-key --name work.key --dir /tmp/keys
 
 # 3. 加密字符串（输出 Base64）
 cipher=$(./tools encrypt --work-key work.key --key-dir /tmp/keys "hello-world")
@@ -210,7 +238,7 @@ Create Work Key: work.key Done
 ## 目录结构（核心部分）
 
 - `main.go`：入口与命令注册
-- `keys/`：key-gen 命令实现（参数解析与调用）
+- `keys/`：gen-root-key / gen-work-key / gen-random-key 命令实现（参数解析与调用）
 - `encrypt/`：字符串加密命令
 - `common/`：加密、密钥生成/读取与路径等通用逻辑
 
