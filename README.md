@@ -30,7 +30,7 @@ Available Commands:
   decrypt     Decrypt a Base64 string with a work key
   encrypt     Encrypt a string with a work key
   help        Help about any command
-  key-gen     Generate root or work keys
+  key-gen     Generate root/work/random key files
 
 Flags:
   -c, --check   Check cmd run conditions
@@ -42,7 +42,7 @@ Use "tools [command] --help" for more information about a command.
 ### tools key-gen --help 输出
 
 ```text
-Generate root keys (rootKey/root_part_*.key + rootKey/root.salt) or a work key encrypted by the root key.
+Generate root keys (rootKey/root_part_*.key + rootKey/root.salt), a work key encrypted by the root key, or a random key file.
 
 Usage:
   tools key-gen [flags]
@@ -52,7 +52,7 @@ Flags:
   -f, --force         Force Create RootKey, Ignore Exist key.
   -h, --help          help for key-gen
   -n, --name string   Work Key File Name. eg: work.key (default "work.key")
-  -t, --type string   Key Type: root, work.
+  -t, --type string   Key Type: root, work, random.
 ```
 
 ### tools encrypt --help 输出
@@ -123,7 +123,26 @@ Flags:
 ./tools key-gen --type work --name work.key --dir /tmp/keys
 ```
 
-### 3) 加密输入字符串
+### 3) 生成随机密钥文件（random key file）
+随机密钥文件会生成在 `workKey/` 目录下，文件内容是一个 Base64 编码的随机密钥（长度 32 字节）。
+
+```bash
+./tools key-gen --type random --name random.key
+```
+
+强制重建指定随机密钥文件：
+
+```bash
+./tools key-gen --type random --name random.key --force
+```
+
+指定自定义密钥目录：
+
+```bash
+./tools key-gen --type random --name random.key --dir /tmp/keys
+```
+
+### 4) 加密输入字符串
 使用工作密钥加密输入字符串，输出为 Base64（不带换行）。
 
 ```bash
@@ -136,7 +155,7 @@ Flags:
 ./tools encrypt --work-key work.key --key-dir /tmp/keys "your-string"
 ```
 
-### 4) 解密 Base64 字符串
+### 5) 解密 Base64 字符串
 使用工作密钥解密 Base64 密文，输出明文（不带换行）。
 
 ```bash
