@@ -120,7 +120,7 @@ func GetRootKey() ([]byte, error) {
 	matrix := subs[0]
 	for i := 1; i < len(subs); i++ {
 		for j := 0; j < len(matrix); j++ {
-			matrix[i] = matrix[i] ^ subs[i][j]
+			matrix[j] = matrix[j] ^ subs[i][j]
 		}
 	}
 
