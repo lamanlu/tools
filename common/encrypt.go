@@ -7,6 +7,7 @@ import (
 	"io"
 )
 
+// Core encryption/decryption.
 func encrypt(text []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {

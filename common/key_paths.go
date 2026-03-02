@@ -16,6 +16,7 @@ var (
 	WorkKeyDir = "workKey"
 )
 
+// Key path and directory configuration.
 func SetKeyBaseDir(base string) {
 	if base == "" {
 		return
@@ -30,6 +31,7 @@ func SetKeyBaseDir(base string) {
 	WorkKeyDir = filepath.Join(base, "workKey")
 }
 
+// Key file naming helpers.
 func rootPartFileName(idx int) string {
 	name := fmt.Sprintf("%s%d%s", RootKeyPartPrefix, idx+1, RootKeyPartSuffix)
 	return filepath.Join(RootKeyDir, name)

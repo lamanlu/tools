@@ -14,6 +14,7 @@ const (
 	KeyPartNum = 2
 )
 
+// Root key management.
 func CreateRootKeyParts() error {
 	err := touchPath(RootKeyDir, 0740)
 	if err != nil {

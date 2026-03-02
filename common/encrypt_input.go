@@ -1,5 +1,6 @@
 package common
 
+// String input encryption/decryption helpers.
 func EncryptInput(input string, workKey string) (string, error) {
 	key, err := loadWorkKey(workKey)
 	if err != nil {
