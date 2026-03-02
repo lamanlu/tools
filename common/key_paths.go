@@ -30,15 +30,15 @@ func SetKeyBaseDir(base string) {
 	WorkKeyDir = filepath.Join(base, "workKey")
 }
 
-func RootPartFileName(idx int) string {
+func rootPartFileName(idx int) string {
 	name := fmt.Sprintf("%s%d%s", RootKeyPartPrefix, idx+1, RootKeyPartSuffix)
 	return filepath.Join(RootKeyDir, name)
 }
 
-func RootSaltFileName() string {
+func rootSaltFileName() string {
 	return filepath.Join(RootKeyDir, RootKeySaltFile)
 }
 
-func WorkKeyFileName(name string) string {
+func workKeyFileName(name string) string {
 	return filepath.Join(WorkKeyDir, name)
 }

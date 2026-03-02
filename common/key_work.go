@@ -3,42 +3,43 @@ package common
 import (
 	"errors"
 	"os"
+	"strings"
 )
 
 func CreateWorkKey(keyName string) error {
-	err := TouchPath(WorkKeyDir, 0740)
+	err := touchPath(WorkKeyDir, 0740)
 	if err != nil {
 		return err
 	}
 
-	target := WorkKeyFileName(keyName)
+	target := workKeyFileName(keyName)
 	fd, err := os.Create(target)
 	if err != nil {
 		return err
 	}
 	defer fd.Close()
 
-	key, err := GetRandKey(KeyLen)
+	key, err := getRandKey(KeyLen)
 	if err != nil {
 		return err
 	}
 
-	rootKey, err := GetRootKey()
+	rootKey, err := getRootKey()
 	if err != nil {
 		return err
 	}
 
-	encryptKey, err := Encrypt(key, rootKey)
+	encryptKey, err := encrypt(key, rootKey)
 	if err != nil {
 		return err
 	}
 
-	_, err = fd.WriteString(TransByteToBase64(encryptKey))
+	_, err = fd.WriteString(transByteToBase64(encryptKey))
 	return err
 }
 
 func ClearWorkKey(name string) error {
-	target := WorkKeyFileName(name)
+	target := workKeyFileName(name)
 	_, err := os.Stat(target)
 	if os.IsNotExist(err) {
 		return nil
@@ -46,9 +47,9 @@ func ClearWorkKey(name string) error {
 	return os.Remove(target)
 }
 
-func LoadWorkKey(keyFile string) ([]byte, error) {
-	keyFile = WorkKeyFileName(keyFile)
-	if !FileExist(keyFile) {
+func loadWorkKey(keyFile string) ([]byte, error) {
+	keyFile = workKeyFileName(keyFile)
+	if !fileExist(keyFile) {
 		return []byte{}, errors.New("work key file: " + keyFile + " is not exist.")
 	}
 
@@ -57,15 +58,15 @@ func LoadWorkKey(keyFile string) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	workKey, err := TransBase64ToByte(string(keyStr))
+	workKey, err := transBase64ToByte(strings.TrimSpace(string(keyStr)))
 	if err != nil {
 		return []byte{}, err
 	}
 
-	rootKey, err := GetRootKey()
+	rootKey, err := getRootKey()
 	if err != nil {
 		return []byte{}, err
 	}
 
-	return Decrypt(workKey, rootKey)
+	return decrypt(workKey, rootKey)
 }

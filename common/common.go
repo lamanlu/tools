@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func GetRandKey(keyLen int) ([]byte, error) {
+func getRandKey(keyLen int) ([]byte, error) {
 	key := make([]byte, keyLen)
 	_, err := rand.Read(key)
 	if err != nil {
@@ -16,15 +16,15 @@ func GetRandKey(keyLen int) ([]byte, error) {
 	return key, nil
 }
 
-func TransBase64ToByte(s string) ([]byte, error) {
+func transBase64ToByte(s string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s)
 }
 
-func TransByteToBase64(b []byte) string {
+func transByteToBase64(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func TouchPath(path string, mode uint32) error {
+func touchPath(path string, mode uint32) error {
 	_, err := os.Stat(path)
 	if !os.IsNotExist(err) {
 		return err
@@ -33,7 +33,7 @@ func TouchPath(path string, mode uint32) error {
 	return err
 }
 
-func FileExist(file string) bool {
+func fileExist(file string) bool {
 	_, err := os.Stat(file)
 	return !os.IsNotExist(err)
 }

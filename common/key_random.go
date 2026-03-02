@@ -6,12 +6,12 @@ import (
 )
 
 func CreateRandomKeyFile(keyName string) error {
-	err := TouchPath(WorkKeyDir, 0740)
+	err := touchPath(WorkKeyDir, 0740)
 	if err != nil {
 		return err
 	}
 
-	target := WorkKeyFileName(keyName)
+	target := workKeyFileName(keyName)
 	_, err = os.Stat(target)
 	if !os.IsNotExist(err) {
 		return errors.New("random key file: " + target + " already exist")
@@ -23,11 +23,11 @@ func CreateRandomKeyFile(keyName string) error {
 	}
 	defer fd.Close()
 
-	key, err := GetRandKey(KeyLen)
+	key, err := getRandKey(KeyLen)
 	if err != nil {
 		return err
 	}
 
-	_, err = fd.WriteString(TransByteToBase64(key))
+	_, err = fd.WriteString(transByteToBase64(key))
 	return err
 }
